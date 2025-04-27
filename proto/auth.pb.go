@@ -144,8 +144,8 @@ func (x *LoginRequest) GetPassword() string {
 
 type AuthResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	User          *User                  `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
+	Token         string `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	User          *User  `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
