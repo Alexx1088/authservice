@@ -1,5 +1,4 @@
 module github.com/Alexx1088/authservice
-
 go 1.24.1
 
 require (
