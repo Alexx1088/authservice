@@ -16,7 +16,7 @@ import (
 // AuthServiceServer implements AuthServiceServer
 type AuthServiceServer struct {
 	pb.UnimplementedAuthServiceServer
-	Repo repository
+	Repo repository.Auth
 }
 
 func NewAuthServiceServer() *AuthServiceServer {
