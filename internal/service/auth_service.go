@@ -5,15 +5,18 @@ import (
 	"errors"
 	"fmt"
 	"github.com/Alexx1088/authservice/internal/dto"
+	"github.com/Alexx1088/authservice/internal/model"
 	pb "github.com/Alexx1088/authservice/proto"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
+	"github.com/Alexx1088/authservice/internal/repository"
 )
 
 // AuthServiceServer implements AuthServiceServer
 type AuthServiceServer struct {
 	pb.UnimplementedAuthServiceServer
+	Repo repository
 }
 
 func NewAuthServiceServer() *AuthServiceServer {
@@ -49,7 +52,12 @@ func (s *AuthServiceServer) Register(ctx context.Context, req *pb.RegisterReques
 	}
 	// 4. Save the user to the database
 	userID := uuid.New().String()
-
+	user := &model.User{
+		ID:        userID,
+		Email:     req.GetEmail(),
+		HashedPassword: string(hashedPassword),
+	}
+if err := s.Repo
 	// 5. Generate a token (here we mock it)
 
 	// 6. Map DTO back to Protobuf AuthResponse

@@ -22,10 +22,9 @@ func Connect() error {
 	user := os.Getenv("DB_USER")
 	password := os.Getenv("DB_PASSWORD")
 	dbname := os.Getenv("DB_NAME")
-	sslmode := os.Getenv("DB_SSLMODE")
+	sslmode := os.Getenv("SSLMODE")
 
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s", user, password, host, port, dbname, sslmode)
-
 	Pool, err = pgxpool.New(context.Background(), connStr)
 	return err
 

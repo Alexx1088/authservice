@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"github.com/Alexx1088/authservice/internal/db"
 	"github.com/Alexx1088/authservice/internal/migrate"
 	"log"
+	"os"
 )
 
 func main() {
@@ -14,7 +16,15 @@ func main() {
 	}
 	defer db.Pool.Close()
 
-	dbURL := "postgres://:password@localhost:5433/authservice?sslmode=disable"
+	dbURL := fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s?sslmode=%s",
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_NAME"),
+		os.Getenv("SSL_MODE"),
+	)
 
 	if err := migrate.RunMigrations(migrationsPath, dbURL); err != nil {
 		log.Fatalf("Migration failed: %v", err)
