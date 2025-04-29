@@ -11,7 +11,7 @@ import (
 
 var Pool *pgxpool.Pool
 
-func connect() error {
+func Connect() error {
 	err := godotenv.Load()
 	if err != nil {
 		log.Println("No .env file found or failed to load .env file")
