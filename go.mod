@@ -3,6 +3,7 @@ module github.com/Alexx1088/authservice
 go 1.24.1
 
 require (
+	github.com/Alexx1088/userservice v0.0.0-20250430173854-bb016c12bbcc
 	github.com/go-playground/validator/v10 v10.26.0
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/golang-migrate/migrate/v4 v4.18.3

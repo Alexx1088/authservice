@@ -1,3 +1,5 @@
+github.com/Alexx1088/userservice v0.0.0-20250430173854-bb016c12bbcc h1:uXuLlqi5cQCFAaYRYN05IBx6jkPwIhzQ7eXq9qkcoh8=
+github.com/Alexx1088/userservice v0.0.0-20250430173854-bb016c12bbcc/go.mod h1:BlGuN8106sqFHPcrquknoIP3MD/TA+P0yE+ELkFr1us=
 github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 h1:L/gRVlceqvL25UVaW/CKtUDjefjrs0SPonmDGUVOYP0=
 github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161/go.mod h1:xomTg63KZ2rFqZQzSB4Vz2SUXa1BpHTVz9L5PTmPC4E=
 github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERoyfY=

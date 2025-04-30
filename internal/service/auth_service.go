@@ -6,17 +6,22 @@ import (
 	"fmt"
 	"github.com/Alexx1088/authservice/internal/dto"
 	"github.com/Alexx1088/authservice/internal/model"
+	"github.com/Alexx1088/authservice/internal/repository"
+	"github.com/Alexx1088/authservice/pkg/jwtutil"
 	pb "github.com/Alexx1088/authservice/proto"
+	userpb "github.com/Alexx1088/userservice/proto"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
-	"github.com/Alexx1088/authservice/internal/repository"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // AuthServiceServer implements AuthServiceServer
 type AuthServiceServer struct {
 	pb.UnimplementedAuthServiceServer
-	Repo repository.AuthRepository
+	Repo        repository.AuthRepository
+	UserService userpb.UserServiceClient
 }
 
 func NewAuthServiceServer() *AuthServiceServer {
@@ -53,12 +58,30 @@ func (s *AuthServiceServer) Register(ctx context.Context, req *pb.RegisterReques
 	// 4. Save the user to the database
 	userID := uuid.New().String()
 	user := &model.User{
-		ID:        userID,
-		Email:     req.GetEmail(),
+		ID:             userID,
+		Email:          req.GetEmail(),
 		HashedPassword: string(hashedPassword),
 	}
-if err := s.Repo
-	// 5. Generate a token (here we mock it)
+
+	if err := s.Repo.Create(ctx, user); err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to create user: %v", err)
+	}
+
+	_, err = s.UserService.CreateUser(ctx, &userpb.CreateUserRequest{
+		UserId:  userID,
+		Name:    req.GetName(),
+		Surname: req.GetSurname(),
+		Email:   req.GetEmail(),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create user in UserService: %w", err)
+	}
+
+	// 5. Generate a token
+	token, err := jwtutil.GenerateToken(userID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate token: %w", err)
+	}
 
 	// 6. Map DTO back to Protobuf AuthResponse
 
