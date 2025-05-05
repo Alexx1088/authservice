@@ -1,9 +1,11 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/Alexx1088/authservice/internal/db"
 	"github.com/Alexx1088/authservice/internal/migrate"
+	"github.com/Alexx1088/authservice/internal/repository"
 	"github.com/Alexx1088/authservice/internal/service"
 	pb "github.com/Alexx1088/authservice/proto"
 	userpb "github.com/Alexx1088/userservice/proto"
@@ -20,7 +22,6 @@ func main() {
 	if err := db.Connect(); err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
-	defer db.Pool.Close()
 
 	dbURL := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=%s",
@@ -46,7 +47,12 @@ func main() {
 	userClient := userpb.NewUserServiceClient(conn)
 
 	// Initialize database/repository here (example)
-	repo := repository.NewAuthRepository() // implement this if not yet done
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		log.Fatalf("failed to connect to DB: %v", err)
+	}
+	defer db.Close()
+	repo := repository.NewAuthRepository(db) // implement this if not yet done
 
 	// Create AuthService server
 	authServer := &service.AuthServiceServer{
