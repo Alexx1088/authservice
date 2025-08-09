@@ -3,7 +3,7 @@ module github.com/Alexx1088/authservice
 go 1.24.1
 
 require (
-	github.com/Alexx1088/userservice v0.0.0-20250430173854-bb016c12bbcc
+	github.com/Alexx1088/userservice v0.0.0-20250507174616-1bc8756ad090
 	github.com/go-playground/validator/v10 v10.26.0
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/golang-migrate/migrate/v4 v4.18.3
@@ -33,5 +33,5 @@ require (
 	golang.org/x/sync v0.13.0 // indirect
 	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/text v0.24.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250303144028-a0af3efb3deb // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250324211829-b45e905df463 // indirect
 )

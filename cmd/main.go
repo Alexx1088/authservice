@@ -9,6 +9,7 @@ import (
 	"github.com/Alexx1088/authservice/internal/service"
 	pb "github.com/Alexx1088/authservice/proto"
 	userpb "github.com/Alexx1088/userservice/proto"
+	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -17,7 +18,15 @@ import (
 
 func main() {
 
-	migrationsPath := "file://migrations"
+	log.Println("Loading .env from /app/.env")
+	err := godotenv.Load("/app/.env")
+	if err != nil {
+		log.Println("❌ .env not loaded:", err)
+	} else {
+		log.Println("✅ .env loaded")
+	}
+
+	migrationsPath := "file:///app/migrations"
 
 	if err := db.Connect(); err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
@@ -33,13 +42,15 @@ func main() {
 		os.Getenv("SSL_MODE"),
 	)
 
+	log.Printf("Database URL: %s", dbURL)
+
 	if err := migrate.RunMigrations(migrationsPath, dbURL); err != nil {
 		log.Fatalf("Migration failed: %v", err)
 		log.Println("Connected to DB and migration applied successfully.")
 	}
 
 	// Connect to UserService
-	conn, err := grpc.Dial("userservice:50051", grpc.WithInsecure())
+	conn, err := grpc.Dial(os.Getenv("USER_SERVICE_HOST"), grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("failed to connect to UserService: %v", err)
 	}

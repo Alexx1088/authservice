@@ -17,14 +17,13 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// AuthServiceServer implements AuthServiceServer
 type AuthServiceServer struct {
 	pb.UnimplementedAuthServiceServer
 	Repo        repository.AuthRepository
 	UserService userpb.UserServiceClient
 }
 
-func NewAuthServiceServer() *AuthServiceServer {
+func NewAuthServiceServer(repo repository.AuthRepository, userService userpb.UserServiceClient) *AuthServiceServer {
 	return &AuthServiceServer{}
 }
 
@@ -50,12 +49,13 @@ func (s *AuthServiceServer) Register(ctx context.Context, req *pb.RegisterReques
 		return nil, fmt.Errorf("validation error: %w", err)
 	}
 
-	// 3. Hash the password
+	// 4. Hash the password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.GetPassword()), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, fmt.Errorf("failed to hash password: %w", err)
 	}
-	// 4. Save the user to the database
+
+	// 5. Save the user to the database
 	userID := uuid.New().String()
 	user := &model.User{
 		ID:             userID,
@@ -67,6 +67,7 @@ func (s *AuthServiceServer) Register(ctx context.Context, req *pb.RegisterReques
 		return nil, status.Errorf(codes.Internal, "failed to create user: %v", err)
 	}
 
+	// 6. Create user in UserService (if necessary)
 	_, err = s.UserService.CreateUser(ctx, &userpb.CreateUserRequest{
 		UserId:  userID,
 		Name:    req.GetName(),
@@ -77,21 +78,20 @@ func (s *AuthServiceServer) Register(ctx context.Context, req *pb.RegisterReques
 		return nil, fmt.Errorf("failed to create user in UserService: %w", err)
 	}
 
-	// 5. Generate a token
+	// 7. Generate a token
 	token, err := jwtutil.GenerateToken(userID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate token: %w", err)
 	}
 
-	// 6. Map DTO back to Protobuf AuthResponse
-
+	// 8. Map DTO back to Protobuf AuthResponse
 	response := &pb.AuthResponse{
 		Token: token,
 		User: &pb.User{
-			UserId:  createdUser.ID,
-			Name:    createdUser.Name,
-			Surname: createdUser.Surname,
-			Email:   createdUser.Email,
+			UserId:  user.ID,
+			Name:    req.GetName(),
+			Surname: req.GetSurname(),
+			Email:   user.Email,
 		},
 	}
 	return response, nil

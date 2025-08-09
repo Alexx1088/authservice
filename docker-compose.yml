@@ -1,5 +1,35 @@
-
 services:
+  authservice:
+    build:
+      context: .
+    platform: linux/amd64
+    ports:
+      - "50051:50051"
+    volumes:
+      - .env:/app/.env
+      - ./migrations:/app/migrations
+    networks:
+      - microservice-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  migrator:
+    platform: linux/amd64
+    build:
+      context: .
+    entrypoint: ["/app/migrate"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgres://user:password@postgres:5432/authservice?sslmode=disable
+    volumes:
+      - .env:/app/.env
+      - ./migrations:/app/migrations
+    networks:
+      - microservice-net
+
   postgres:
     image: postgres:14
     restart: always
@@ -9,9 +39,15 @@ services:
       POSTGRES_DB: authservice
     ports:
       - "5433:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U user -d authservice" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     volumes:
       - pgdata:/var/lib/postgresql/data
-    container_name: authservice_db
+    networks:
+      - microservice-net
 
   adminer_backend:
     image: michalhosna/adminer
@@ -20,13 +56,16 @@ services:
     depends_on:
       - postgres
     environment:
-      ADMINER_DB: "${DB_DATABASE:-app}"
-      ADMINER_PASSWORD: "${DB_PASSWORD:-secret}"
-      ADMINER_SERVER: "${DB_HOST:-mysql}"
-      ADMINER_USERNAME: "${DB_USERNAME:-app}"
+      ADMINER_DB: authservice
+      ADMINER_PASSWORD: password
+      ADMINER_SERVER: postgres
+      ADMINER_USERNAME: user
       ADMINER_AUTOLOGIN: 1
-    container_name: auth_service_adm
-
+    networks:
+      - microservice-net
 
 volumes:
   pgdata:
+networks:
+  microservice-net:
+    external: true

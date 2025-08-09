@@ -18,7 +18,7 @@ func NewAuthRepository(db *sql.DB) AuthRepository {
 
 func (r *authRepository) Create(ctx context.Context, user *model.User) error {
 	_, err := r.db.ExecContext(ctx,
-		`INSERT INTO users (id, email, hashed_password) VALUES ($1, $2, $3)`,
+		`INSERT INTO auth_users (id, email, hashed_password) VALUES ($1, $2, $3)`,
 		user.ID, user.Email, user.HashedPassword,
 	)
 	return err
@@ -26,7 +26,7 @@ func (r *authRepository) Create(ctx context.Context, user *model.User) error {
 
 func (r *authRepository) FindByEmail(ctx context.Context, email string) (*model.User, error) {
 	row := r.db.QueryRowContext(ctx,
-		`SELECT id, email, hashed_password FROM users WHERE email = $1`, email,
+		`SELECT id, email, hashed_password FROM auth_users WHERE email = $1`, email,
 	)
 
 	var u model.User
