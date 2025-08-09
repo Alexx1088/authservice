@@ -3,7 +3,7 @@ package auth;
 
 option go_package = "authservice/proto;proto";
 
-import "googleapis/google/api/annotations.proto";
+import "google/api/annotations.proto";
 
 service AuthService {
   rpc Register(RegisterRequest) returns (AuthResponse) {
@@ -15,7 +15,7 @@ service AuthService {
 
   rpc Login(LoginRequest) returns (AuthResponse) {
     option (google.api.http) = {
-      post: "/v1/auth/login.go"
+      post: "/v1/auth/login"
       body: "*"
     };
   }
